@@ -54,7 +54,7 @@ def horaires(url,selecteur):
             for resField in horaire.cssselect(v):
                 for itText in resField.itertext():
                     texte += itText.strip()
-                    print itText.strip() 
+#                   print itText.strip() 
             item.append(texte)
         extractions.append(item)
     
