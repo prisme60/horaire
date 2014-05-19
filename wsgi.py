@@ -92,6 +92,9 @@ urls = {
 "p"            : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSE&destination=&ligne=J&nomGare=PONTOISE&x=46&y=11'),
 "sartrouville" : (selecteurTransilien,'http://www.transilien.com/gare/SARTROUVILLE-8738641'),
 "s"            : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=SVL&destination=CERGY+PREFECTURE&ligne=&nomGare=SARTROUVILLE&x=38&y=11'),
+"psl"          : (selecteurTransilien,'http://www.transilien.com/gare/GARE-DE-PARIS-SAINT-LAZARE-8738400'),
+"psll"         : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSL&destination=&ligne=L&nomGare=GARE+DE+PARIS+SAINT-LAZARE&x=26&y=12'),
+"pslj"         : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSL&destination=&ligne=J&nomGare=GARE+DE+PARIS+SAINT-LAZARE&x=29&y=6'),
 "psl_d"        : (selecteurGareEnMvt ,'http://www.gares-en-mouvement.com/fr/frpsl/horaires-temps-reel/dep/'),
 "psl_a"        : (selecteurGareEnMvt ,'http://www.gares-en-mouvement.com/fr/frpsl/horaires-temps-reel/arr/')
 }
