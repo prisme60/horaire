@@ -4,10 +4,18 @@ import sys
 import urllib
 import urllib2
 
+the_url = 'https://smsapi.free-mobile.fr/sendmsg'
+
+def writeRawMsg(rawMsg):
+    values = {'user' : 'loginNumber',
+              'pass' : 'PaSsWoRdStRiNg' }
+    data = urllib.urlencode(values)
+    req = urllib2.Request(the_url + '?' + data + '&' + rawMsg)
+    handle = urllib2.urlopen(req)
+    the_page = handle.read()
+
 
 def writeMsg(msg):
-    #the_url = 'https://prisme.dyndns.dk'
-    the_url = 'https://smsapi.free-mobile.fr/sendmsg'
     values = {'user' : 'loginNumber',
               'pass' : 'PaSsWoRdStRiNg',
               'msg' : msg }
