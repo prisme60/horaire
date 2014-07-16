@@ -1,4 +1,4 @@
-
+#!/usr/bin/python
 
 # lxml is a complete library for parsing xml and html files.  http://codespeak.net/lxml/
 # The interface is not totally intuitive, but it is very effective to use, 
@@ -31,6 +31,16 @@ def selecteurGareEnMvt(root):
                  "destination":".tvs_td_originedestination",
                  "situation"  :".tvs_td_situation",
                  "voie"       :".tvs_td_voie"}
+    return horaires, fields
+
+def selecteurRATP(root):
+    # Use cssselect to select elements by their css code
+    horaires = root.cssselect(".rer table tbody tr")      # returns n elements
+    fields = {}
+    if len(horaires)>=1:
+       fields = {"code"       :".name",
+                 "destination":".terminus",
+                 "situation"  :".passing_time"}
     return horaires, fields
 
 def horaires(pathInfo):
@@ -83,10 +93,12 @@ urls = {
 "psll"         : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSL&destination=&ligne=L&nomGare=GARE+DE+PARIS+SAINT-LAZARE&x=26&y=12'),
 "pslj"         : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSL&destination=&ligne=J&nomGare=GARE+DE+PARIS+SAINT-LAZARE&x=29&y=6'),
 "psl_d"        : (selecteurGareEnMvt ,'http://www.gares-en-mouvement.com/fr/frpsl/horaires-temps-reel/dep/'),
-"psl_a"        : (selecteurGareEnMvt ,'http://www.gares-en-mouvement.com/fr/frpsl/horaires-temps-reel/arr/')
+"psl_a"        : (selecteurGareEnMvt ,'http://www.gares-en-mouvement.com/fr/frpsl/horaires-temps-reel/arr/'),
+"auber"        : (selecteurRATP      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Auber/A'),
+"lepecq"       : (selecteurRATP      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Le+Vesinet+le+Pecq/R')
 }
 
 if __name__ == '__main__':
     for code, (selecteurSite,url) in urls.items():
-	print horaires(url, selecteurSite)
+	print horaires(code)
 
