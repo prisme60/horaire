@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import enable_wlan
 import scrappingHoraire
@@ -9,8 +9,8 @@ def horairesHTML(pathInfo):
     htmlStr = "<table>"
     for extraction in extractions:
         htmlStr += "<tr>"
-	for field in extraction:
-	     htmlStr += "<td>" + field + "</td>"
+        for field in extraction:
+            htmlStr += "<td>" + field + "</td>"
         htmlStr += "</tr>"
     htmlStr += "</table>"
     return [htmlStr.encode("utf-8")]
@@ -72,15 +72,15 @@ def application(env, start_response):
     if pathInfo in urls_action:
         return exec_action(pathInfo, env["QUERY_STRING"], body)
     elif pathInfo in scrappingHoraire.getUrls():
-	return horairesHTML(pathInfo)
+        return horairesHTML(pathInfo)
     else:
         return [listeGaresHTML()+listeActionHTML()]
 
 if __name__ == '__main__':
     for code, (selecteurSite,url) in scrappingHoraire.getUrls().items():
-	print horairesHTML(code)
-    print [listeGaresHTML()+listeActionHTML()]
+        print(horairesHTML(code))
+    print([listeGaresHTML()+listeActionHTML()])
     for (key,(action,param)) in urls_action.items():
-        print action(key,param,"","msg=Coucou%20a%20tous")
+        print(action(key,param,"","msg=Coucou%20a%20tous"))
 
 

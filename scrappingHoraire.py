@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # lxml is a complete library for parsing xml and html files.  http://codespeak.net/lxml/
 # The interface is not totally intuitive, but it is very effective to use, 
@@ -100,5 +100,5 @@ urls = {
 
 if __name__ == '__main__':
     for code, (selecteurSite,url) in urls.items():
-	print horaires(code)
+        print(horaires(code))
 

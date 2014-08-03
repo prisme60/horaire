@@ -1,16 +1,18 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 import urllib
-import urllib2
+from urllib import parse
+from urllib import request
 from accounts import Accounts
 
 def writeRawMsgUser(rawMsg, user):
     values = Accounts.accounts[user]
-    rawMsgFiltered = rawMsg.replace('%0A%0D','%0A').replace('%0D','%0A') #because \n is not managed by free mobile, we need to replace it by \r
-    data = urllib.urlencode(values)
-    req = urllib2.Request(Accounts.the_url + '?' + data + '&' + rawMsg)
-    handle = urllib2.urlopen(req)
+    #print("rawMsg " + repr(rawMsg))
+    rawMsgFiltered = rawMsg.decode().replace('%0A%0D','%0A').replace('%0D','%0A') #because \n is not managed by free mobile, we need to replace it by \r
+    data = urllib.parse.urlencode(values)
+    req = urllib.request.Request(Accounts.the_url + '?' + data + '&' + rawMsgFiltered)
+    handle = urllib.request.urlopen(req)
     the_page = handle.read()
 
 def writeRawMsg(rawMsg):
@@ -19,11 +21,11 @@ def writeRawMsg(rawMsg):
 def writeMsgUser(msg, user):
     values =  Accounts.accounts[user]   
     values['msg'] = msg.encode('utf-8')
-    data = urllib.urlencode(values)
+    data = urllib.parse.urlencode(values)
     
-    #req = urllib2.Request(the_url, data)
-    req = urllib2.Request(Accounts.the_url + '?' + data)
-    handle = urllib2.urlopen(req)
+    #req = urllib.request.Request(the_url, data)
+    req = urllib.request.Request(b(Accounts.the_url + '?' + data))
+    handle = urllib.request.urlopen(req)
     the_page = handle.read()
 
 def writeMsg(msg):
