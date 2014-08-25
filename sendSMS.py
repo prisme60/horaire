@@ -24,7 +24,8 @@ def writeMsgUser(msg, user):
     data = urllib.parse.urlencode(values)
     
     #req = urllib.request.Request(the_url, data)
-    req = urllib.request.Request(b(Accounts.the_url + '?' + data))
+    print(Accounts.the_url + '?' + data)
+    req = urllib.request.Request(Accounts.the_url + '?' + data)
     handle = urllib.request.urlopen(req)
     the_page = handle.read()
 
