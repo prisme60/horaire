@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+""" this module retrieves times of the trains from website (RATP, Transilien, SNCF) """
+
 # lxml is a complete library for parsing xml and html files.  http://codespeak.net/lxml/
 # The interface is not totally intuitive, but it is very effective to use, 
 # especially with cssselect.
@@ -13,12 +15,12 @@ def selecteurTransilien(root):
     fields = {}
 
     if len(horaires)>=1:
-       del horaires[0]
+        del horaires[0]
 
-       fields = {"code"       :".nom",
-                 "heure"      :".nom + td",
-                 "destination":".nom + td + td",
-                 "voie"       :".nom + td + td + td + td"}
+        fields = {"code"       :".nom",
+                  "heure"      :".nom + td",
+                  "destination":".nom + td + td",
+                  "voie"       :".nom + td + td + td + td"}
     return horaires, fields
 
 def selecteurGareEnMvt(root):
@@ -26,11 +28,11 @@ def selecteurGareEnMvt(root):
     horaires = root.cssselect(".tab_horaires_tps_reel tbody tr")      # returns n elements
     fields = {}
     if len(horaires)>=1:
-       fields = {"code"       :".tvs_td_numero",
-                 "heure"      :".tvs_td_heure",
-                 "destination":".tvs_td_originedestination",
-                 "situation"  :".tvs_td_situation",
-                 "voie"       :".tvs_td_voie"}
+        fields = {"code"       :".tvs_td_numero",
+                  "heure"      :".tvs_td_heure",
+                  "destination":".tvs_td_originedestination",
+                  "situation"  :".tvs_td_situation",
+                  "voie"       :".tvs_td_voie"}
     return horaires, fields
 
 def selecteurRATP(root):
@@ -38,12 +40,13 @@ def selecteurRATP(root):
     horaires = root.cssselect(".rer table tbody tr")      # returns n elements
     fields = {}
     if len(horaires)>=1:
-       fields = {"code"       :".name",
-                 "destination":".terminus",
-                 "situation"  :".passing_time"}
+        fields = {"code"       :".name",
+                  "destination":".terminus",
+                  "situation"  :".passing_time"}
     return horaires, fields
 
 def horaires(pathInfo):
+    """ return extracted times according given pathInfo """
     (selecteur, url) = urls[pathInfo]
 
     #print help(lxml.html.parse)
@@ -59,8 +62,8 @@ def horaires(pathInfo):
     extractions = []
     for horaire in horaires:
 #        extractions.append([horaire.cssselect(v)[0].text.strip() for k,v in fields.items()])
-        item = [];
-        for k,v in fields.items():
+        item = []
+        for k, v in fields.items():
             texte = ""
             for resField in horaire.cssselect(v):
                 for itText in resField.itertext():
@@ -99,6 +102,6 @@ urls = {
 }
 
 if __name__ == '__main__':
-    for code, (selecteurSite,url) in urls.items():
+    for code, (selecteurSite, url) in urls.items():
         print(horaires(code))
 

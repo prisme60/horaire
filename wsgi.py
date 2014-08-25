@@ -3,6 +3,8 @@
 import enable_wlan
 import scrappingHoraire
 import sendSMS
+import sendMsgToDisplay
+import urllib.parse
 
 def horairesHTML(pathInfo):
     extractions = scrappingHoraire.horaires(pathInfo)
@@ -27,7 +29,7 @@ def listeActionHTML():
     return htmlStr.encode("utf-8")
 
 def exec_action(key, queryString, body):
-    (action,param) = urls_action[key]
+    (action, param) = urls_action[key]
     return [action(key, param, queryString, body)]
 
 def wlanSet(key, enable, queryString, body):
@@ -38,6 +40,13 @@ def wlanState(key, notUsed, queryString, body):
     state = enable_wlan.wlan_interface_state()
     return key + ': ' + ('ON' if state else 'OFF')
 
+def alarmSet(key, notUsed, queryString, body):
+    dict = urllib.parse.parse_qs(body.decode('utf-8'))
+    #return ', '.join("{!s}={!r}".format(key,val) for (key,val) in dict.items()).encode('utf-8')
+    #return dict[b'msg'][0]
+    sendMsgToDisplay.sendMsg(dict['msg'][0],'wsgi')
+    return "Alarm displayed"
+
 def msgSet(key, notUsed, queryString, body):
     sendSMS.writeRawMsg(body)
     return "Message sent"
@@ -46,6 +55,7 @@ urls_action = {
 "wlanON" : (wlanSet, True),
 "wlanOFF" : (wlanSet, False),
 "wlan" : (wlanState,None),
+"writeAlarm" : (alarmSet, None),
 "writeMsg" : (msgSet, None)
 }
 
@@ -58,7 +68,7 @@ def listeGaresHTML():
 def application(env, start_response):
     start_response('200 OK', [('Content-Type', 'text/html')])
 
-    body= '' # b'' for consistency on Python 3.0
+    body = '' # b'' for consistency on Python 3.0
     try:
         length_str = env.get('CONTENT_LENGTH',"0") 
         length = int(length_str)
@@ -77,10 +87,10 @@ def application(env, start_response):
         return [listeGaresHTML()+listeActionHTML()]
 
 if __name__ == '__main__':
-    for code, (selecteurSite,url) in scrappingHoraire.getUrls().items():
+    for code, (selecteurSite, url) in scrappingHoraire.getUrls().items():
         print(horairesHTML(code))
     print([listeGaresHTML()+listeActionHTML()])
-    for (key,(action,param)) in urls_action.items():
-        print(action(key,param,"","msg=Coucou%20a%20tous"))
+    for (key, (action, param)) in urls_action.items():
+        print(action(key, param, "", "msg=Coucou%20a%20tous"))
 
 
