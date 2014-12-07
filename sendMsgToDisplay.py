@@ -7,7 +7,7 @@ from displayPacket import DisplayPacket
 def sendMsg(message, user="unknown"):
     sock = socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
 
-    server_address = "/var/run/display.socket"
+    server_address = "/run/lcd/socket"
     try:
         sock.connect(server_address)
     except socket.error as e:

@@ -30,7 +30,7 @@ def listeActionHTML():
 
 def exec_action(key, queryString, body):
     (action, param) = urls_action[key]
-    return [action(key, param, queryString, body)]
+    return [action(key, param, queryString, body).encode("utf-8")]
 
 def wlanSet(key, enable, queryString, body):
     enable_wlan.wlan_interface(enable)

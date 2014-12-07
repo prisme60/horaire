@@ -88,6 +88,7 @@ def getUrls():
     return urls
 
 urls = {
+"chars"        : (selecteurTransilien,'http://www.transilien.com/gare/CHARS-8738119'),
 "pontoise"     : (selecteurTransilien,'http://www.transilien.com/gare/PONTOISE-8727613'),
 "p"            : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSE&destination=&ligne=J&nomGare=PONTOISE&x=46&y=11'),
 "sartrouville" : (selecteurTransilien,'http://www.transilien.com/gare/SARTROUVILLE-8738641'),
