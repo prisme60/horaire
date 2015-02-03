@@ -44,12 +44,16 @@ def alarmSet(key, notUsed, queryString, body):
     dict = urllib.parse.parse_qs(body.decode('utf-8'))
     #return ', '.join("{!s}={!r}".format(key,val) for (key,val) in dict.items()).encode('utf-8')
     #return dict[b'msg'][0]
-    sendMsgToDisplay.sendMsg(dict['msg'][0],'wsgi')
+    sendMsgToDisplay.sendMsg(dict['msg'][0], 'wsgi')
     return "Alarm displayed"
 
 def msgSet(key, notUsed, queryString, body):
-    sendSMS.writeRawMsg(body)
-    return "Message sent"
+    """no treatment on the body (we send exactly the body like we received it)"""
+    dict = urllib.parse.parse_qs(body.decode('utf-8'))
+    #sendSMS.writeRawMsg(body)
+    user = dict.get('usr', 'cf')
+    sendSMS.writeMsgUser(dict['msg'][0], user)
+    return "Message sent to " + user
 
 urls_action = {
 "wlanON" : (wlanSet, True),
@@ -68,9 +72,9 @@ def listeGaresHTML():
 def application(env, start_response):
     start_response('200 OK', [('Content-Type', 'text/html')])
 
-    body = '' # b'' for consistency on Python 3.0
+    body = ''  # b'' for consistency on Python 3.0
     try:
-        length_str = env.get('CONTENT_LENGTH',"0") 
+        length_str = env.get('CONTENT_LENGTH', '0')
         length = int(length_str)
     except ValueError:
         length = 0
