@@ -45,8 +45,28 @@ def selecteurRATP(root):
                   "situation"  :".passing_time"}
     return horaires, fields
 
+def horaires_dict(pathInfo):
+    """ return extracted times according given pathInfo with dictionary format """
+    (selecteur, url) = urls[pathInfo]
+    # To load directly from a url, use
+    root = lxml.html.parse(url).getroot()
+
+    horaires, fields = selecteur(root)
+
+    extractions = []
+    for horaire in horaires:
+        dict_horaire = {}
+        for k, v in fields.items():
+            texte = ""
+            for resField in horaire.cssselect(v):
+                for itText in resField.itertext():
+                    texte += itText.strip()
+            dict_horaire[k] = texte
+        extractions.append(dict_horaire)
+    return extractions
+
 def horaires(pathInfo):
-    """ return extracted times according given pathInfo """
+    """ return extracted times according given pathInfo with list format (ready to display) """
     (selecteur, url) = urls[pathInfo]
 
     #print help(lxml.html.parse)
@@ -61,7 +81,6 @@ def horaires(pathInfo):
 
     extractions = []
     for horaire in horaires:
-#        extractions.append([horaire.cssselect(v)[0].text.strip() for k,v in fields.items()])
         item = []
         for k, v in fields.items():
             texte = ""
