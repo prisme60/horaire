@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-""" this module retrieves times of the trains from website (RATP, Transilien, SNCF) """
+""" this module retrieves times of the trains from website (RATP, Transilien) """
 
 # lxml is a complete library for parsing xml and html files.  http://codespeak.net/lxml/
 # The interface is not totally intuitive, but it is very effective to use, 
@@ -21,18 +21,6 @@ def selecteurTransilien(root):
                   "heure"      :".nom + td",
                   "destination":".nom + td + td",
                   "voie"       :".nom + td + td + td + td"}
-    return horaires, fields
-
-def selecteurGareEnMvt(root):
-    # Use cssselect to select elements by their css code
-    horaires = root.cssselect(".tab_horaires_tps_reel tbody tr")      # returns n elements
-    fields = {}
-    if len(horaires)>=1:
-        fields = {"code"       :".tvs_td_numero",
-                  "heure"      :".tvs_td_heure",
-                  "destination":".tvs_td_originedestination",
-                  "situation"  :".tvs_td_situation",
-                  "voie"       :".tvs_td_voie"}
     return horaires, fields
 
 def selecteurRATP(root):
@@ -115,8 +103,6 @@ urls = {
 "psl"          : (selecteurTransilien,'http://www.transilien.com/gare/GARE-DE-PARIS-SAINT-LAZARE-8738400'),
 "psll"         : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSL&destination=&ligne=L&nomGare=GARE+DE+PARIS+SAINT-LAZARE&x=26&y=12'),
 "pslj"         : (selecteurTransilien,'http://www.transilien.com/gare/pagegare/filterListeTrains?codeTR3A=PSL&destination=&ligne=J&nomGare=GARE+DE+PARIS+SAINT-LAZARE&x=29&y=6'),
-"psl_d"        : (selecteurGareEnMvt ,'http://www.gares-en-mouvement.com/fr/frpsl/horaires-temps-reel/dep/'),
-"psl_a"        : (selecteurGareEnMvt ,'http://www.gares-en-mouvement.com/fr/frpsl/horaires-temps-reel/arr/'),
 "auber"        : (selecteurRATP      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Auber/A'),
 "lepecq"       : (selecteurRATP      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Le+Vesinet+le+Pecq/R')
 }

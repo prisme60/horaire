@@ -2,12 +2,13 @@
 
 import enable_wlan
 import scrappingHoraire
+import jsonHoraire
 import sendSMS
 import sendMsgToDisplay
 import urllib.parse
 
-def horairesHTML(pathInfo):
-    extractions = scrappingHoraire.horaires(pathInfo)
+def horairesHTML(pathInfo, source_fct):
+    extractions = source_fct(pathInfo)
     htmlStr = "<table>"
     for extraction in extractions:
         htmlStr += "<tr>"
@@ -52,20 +53,26 @@ def msgSet(key, notUsed, queryString, body):
     dict = urllib.parse.parse_qs(body.decode('utf-8'))
     #sendSMS.writeRawMsg(body)
     user = dict.get('usr', 'cf')
+    print(dict)
     sendSMS.writeMsgUser(dict['msg'][0], user)
     return "Message sent to " + user
 
 urls_action = {
-"wlanON" : (wlanSet, True),
-"wlanOFF" : (wlanSet, False),
-"wlan" : (wlanState,None),
-"writeAlarm" : (alarmSet, None),
-"writeMsg" : (msgSet, None)
+    "wlanON" : (wlanSet, True),
+    "wlanOFF" : (wlanSet, False),
+    "wlan" : (wlanState, None),
+    "writeAlarm" : (alarmSet, None),
+    "writeMsg" : (msgSet, None)
 }
 
 def listeGaresHTML():
+    list_code_gare =[]
     htmlStr = ""
-    for code, (selecteur, url) in sorted(scrappingHoraire.getUrls().items()):
+    for code in scrappingHoraire.getUrls().keys():
+        list_code_gare.append(code)
+    for code in jsonHoraire.getUrls().keys():
+        list_code_gare.append(code)
+    for code in sorted(list_code_gare):
         htmlStr += '<a href="' + code + '">' + code + "</a><p/>"
     return htmlStr.encode("utf-8")
 
@@ -86,15 +93,19 @@ def application(env, start_response):
     if pathInfo in urls_action:
         return exec_action(pathInfo, env["QUERY_STRING"], body)
     elif pathInfo in scrappingHoraire.getUrls():
-        return horairesHTML(pathInfo)
+        return horairesHTML(pathInfo, scrappingHoraire.horaires)
+    elif pathInfo in jsonHoraire.getUrls():
+        return horairesHTML(pathInfo, jsonHoraire.horaires)
     else:
         return [listeGaresHTML()+listeActionHTML()]
 
 if __name__ == '__main__':
-    for code, (selecteurSite, url) in scrappingHoraire.getUrls().items():
-        print(horairesHTML(code))
+    for code in scrappingHoraire.getUrls().keys():
+        print(horairesHTML(code, scrappingHoraire.horaires))
+    for code in jsonHoraire.getUrls().keys():
+        print(horairesHTML(code, jsonHoraire.horaires))
     print([listeGaresHTML()+listeActionHTML()])
     for (key, (action, param)) in urls_action.items():
-        print(action(key, param, "", "msg=Coucou%20a%20tous"))
+        print(action(key, param, "", 'msg=Coucou%20a%20tous'.encode()))
 
 
