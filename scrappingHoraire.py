@@ -13,7 +13,7 @@ import gzip
 
 def selecteur_transilien(root:object):
     # Use cssselect to select elements by their css code
-    horaires = root.cssselect("table.recherche-horaires-resultats tbody tr")      # returns 7 elements (1 header and 6 data)
+    horaires = root.cssselect("#map_b table.recherche-horaires-resultats tbody tr")      # returns 7 elements (1 header and 6 data)
     fields = {}
 
     if len(horaires)>0:
