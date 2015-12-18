@@ -10,6 +10,7 @@ import lxml.etree
 import lxml.html
 import urllib.request
 import gzip
+import re
 
 def selecteur_transilien(root:object):
     # Use cssselect to select elements by their css code
@@ -47,7 +48,8 @@ def horaires_dict(pathInfo:str):
             for resField in horaire.cssselect(v):
                 for itText in resField.itertext():
                     texte += itText.strip()
-            dict_horaire[k] = texte
+            textOneSpace = re.sub('\s+',' ',texte)
+            dict_horaire[k] = textOneSpace
         extractions.append(dict_horaire)
     return extractions
     
@@ -93,8 +95,8 @@ def horaires(pathInfo:str):
             for resField in horaire.cssselect(v):
                 for itText in resField.itertext():
                     texte += itText.strip()
-#                   print itText.strip() 
-            item.append(texte)
+            textOneSpace = re.sub('\s+',' ',texte)
+            item.append(textOneSpace)
         extractions.append(item)
     
     #print extractions
