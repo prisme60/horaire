@@ -38,7 +38,7 @@ def selecteur_RATP(root:object):
 def horaires_dict(pathInfo:str):
     """ return extracted times according given pathInfo with dictionary format """
     (horaires_fct, url) = urls[pathInfo]
-    horaires, fields = horaires_fct(pathInfo)
+    horaires, fields = horaires_fct(url)
 
     extractions = []
     for horaire in horaires:
