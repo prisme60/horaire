@@ -68,8 +68,8 @@ def getUrls():
     return urls
 
 urls = {
-    "psl_d": (selecteur_gare_sncf, 'http://www.gares-sncf.com/fr/train-times/departure/PSL/gl'),
-    "psl_a": (selecteur_gare_sncf, 'http://www.gares-sncf.com/fr/train-times/arrival/PSL/gl')
+    "psl_d": (selecteur_gare_sncf, 'http://www.gares-sncf.com/fr/train-times/PSL/departure'),
+    "psl_a": (selecteur_gare_sncf, 'http://www.gares-sncf.com/fr/train-times/PSL/arrival')
 }
 
 if __name__ == '__main__':
