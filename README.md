@@ -11,7 +11,7 @@ form.html : fichier html qui contient le formulaire, afin de préparer le texte 
 
 scrappingHoraire.py : librairie pour extraire les données des fichiers html du site du transilien ou ratp
 
-jsonHoraire : récupération du JSON du site gare-scnf.com et extraction des données (grandes lignes arrivées et départs)
+jsonHoraire.py : récupération du JSON du site gare-scnf.com et extraction des données (grandes lignes arrivées et départs)
 
 sendHoraireSMS.py : extration des horaires, suivi de son formatage et puis envoie par SMS (s'intègre facilement dans une tâche CRON)
 
