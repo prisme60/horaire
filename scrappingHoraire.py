@@ -11,17 +11,23 @@ import lxml.html
 import urllib.request
 import gzip
 import re
+import time
 
 def selecteur_transilien(root:object):
     # Use cssselect to select elements by their css code
-    horaires = root.cssselect("#map_b table.recherche-horaires-resultats tbody tr")      # returns 7 elements (1 header and 6 data)
+    #test = root.cssselect("#map_b")
+    #print(lxml.etree.tostring(test[0]))
+
+    horaires = root.cssselect("li.resultat_gare")      # returns 7 elements (1 header and 6 data)
     fields = {}
 
+    # TODO à tester
+
     if len(horaires)>0:
-        fields = {"code"       :"td.train span.code",
-                  "heure"      :"td span.hour",
-                  "destination":"td.train + td + td",
-                  "voie"       :"td span.pathway"}
+        fields = {"code"       :"rain_mission",
+                  "heure"      :".heure_train",
+                  "destination":".garearrivee",
+                  "voie"       :"voie.bock"}
 
     return horaires, fields
 
@@ -66,20 +72,9 @@ def horaires_ratp(url):
     return selecteur_RATP(root)
 
 def horaires_transilien(data):
-  req = urllib.request.Request('http://www.transilien.com/horaires/prochains-departs')
-  req.add_header('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
-  req.add_header('Accept-Encoding', 'gzip')
-  #resource = urllib.request.urlopen(req,b'nomGare=PONTOISE')
-  resource = urllib.request.urlopen(req, data)
-  #try:
-  r = gzip.decompress(resource.read())
-  #except OSError:
-  #  pass
-  content = r.decode('utf-8')
-  #print(content)
-  root = lxml.html.document_fromstring(content)
+  url = 'http://www.transilien.mobi/train/result?' + data
+  root = lxml.html.parse(url).getroot()
   return selecteur_transilien(root)
-  
 
 
 def horaires(pathInfo:str):
@@ -115,35 +110,22 @@ def getUrls():
     return urls
 
 
-# POST http://www.transilien.com/horaires/prochains-departs
-# Content-Type: application/x-www-form-urlencoded
-# nomGare=CHARS
-#  -- response --
-# 200 OK
-# Server:  Apache-Coyote/1.1
-# X-Powered-By:  Servlet 2.5; JBoss-5.0/JBossWeb-2.1
-# Content-Type:  text/html;charset=UTF-8
-# Content-Language:  fr-FR
-# Content-Encoding:  gzip
-# Vary:  Accept-Encoding
-# X-Varnish:  131270449, 150663663
-# Transfer-Encoding:  chunked
-# Date:  Wed, 02 Dec 2015 16:20:54 GMT
-# Age:  0
-# Connection:  keep-alive
-# Via:  1.1 varnish, 1.1 bou2-ncdn-middle-http00, 1.1 bou2-ncdn-edge-http00
-
-
+CHARS = 'CHR'
+PONTOISE = 'PSE'
+PSL = 'PSL'
+SARTROUVILLE = 'SVL'
+CERGYPREF = 'CYP'
+NANTERRE_UNIVERSITE = 'NUN'
 
 urls = {
-"chars"        : (horaires_transilien,b'nomGare=CHARS'),
-"pontoise"     : (horaires_transilien,b'nomGare=PONTOISE'),
-"p-chars"      : (horaires_transilien,b'nomGare=PONTOISE&destination=CHARS'),
-"sartrouville" : (horaires_transilien,b'nomGare=SARTROUVILLE'),
-"s-cergypref"  : (horaires_transilien,b'nomGare=SARTROUVILLE&destination=CERGY+PREFECTURE'),
-"psl"          : (horaires_transilien,b'nomGare=GARE+DE+PARIS+SAINT-LAZARE'),
-"psl-nu"       : (horaires_transilien,b'nomGare=GARE+DE+PARIS+SAINT-LAZARE&destination=NANTERRE+UNIVERSITE'),
-"psl-pontoise" : (horaires_transilien,b'nomGare=GARE+DE+PARIS+SAINT-LAZARE&destination=PONTOISE'),
+"chars"        : (horaires_transilien, 'idOrigin=' + CHARS),
+"pontoise"     : (horaires_transilien, 'idOrigin=' + PONTOISE),
+"p-chars"      : (horaires_transilien, 'idOrigin=' + PONTOISE),
+"sartrouville" : (horaires_transilien, 'idOrigin=' + SARTROUVILLE),
+"s-cergypref"  : (horaires_transilien, 'idOrigin=' + SARTROUVILLE + '&idDest=' + CERGYPREF),
+"psl"          : (horaires_transilien, 'idOrigin=' + PSL),
+"psl-nu"       : (horaires_transilien, 'idOrigin=' + PSL + '&idDest=' + NANTERRE_UNIVERSITE),
+"psl-pontoise" : (horaires_transilien, 'idOrigin=' + PSL + '&idDest=' + PONTOISE),
 "auber"        : (horaires_ratp      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Auber/A'),
 "lepecq"       : (horaires_ratp      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Le+Vesinet+le+Pecq/R')
 }
@@ -151,5 +133,6 @@ urls = {
 if __name__ == '__main__':
     for code, (selecteurSite, url) in urls.items():
         print("--------------" + code + "--------------")
+        time.sleep(1)
         print(horaires(code))
 
