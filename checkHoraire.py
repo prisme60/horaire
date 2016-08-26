@@ -32,7 +32,7 @@ def testHoraire(pathinfo:str, destination:str, expected_time:datetime.time):
     return min_delay, dict_of_delays[min_delay]
 
 def check_PSL_from_Chars_7h42():
-    return testHoraire('chars', 'Dir : Paris Saint-Lazare', datetime.time(7, 42))
+    return testHoraire('chars', 'Paris Saint-Lazare', datetime.time(7, 42))
     
 
 if __name__ == '__main__':

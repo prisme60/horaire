@@ -8,10 +8,17 @@
 
 import lxml.etree
 import lxml.html
-import urllib.request
-import gzip
 import re
 import time
+
+
+CODE = "code"
+HEURE = "heure"
+DESTINATION = "destination"
+VOIE = "voie"
+
+DEST_PREFIX = "Dir : "
+
 
 def selecteur_transilien(root:object):
     # Use cssselect to select elements by their css code
@@ -21,25 +28,25 @@ def selecteur_transilien(root:object):
     horaires = root.cssselect("li.resultat_gare")      # returns 7 elements (1 header and 6 data)
     fields = {}
 
-    # TODO à tester
-
     if len(horaires)>0:
-        fields = {"code"       :"rain_mission",
-                  "heure"      :".heure_train",
-                  "destination":".garearrivee",
-                  "voie"       :"voie.bock"}
+        fields = {CODE:        "rain_mission",
+                  HEURE:       ".heure_train",
+                  DESTINATION: ".garearrivee",
+                  VOIE:        ".voie.bock"}
 
     return horaires, fields
+
 
 def selecteur_RATP(root:object):
     # Use cssselect to select elements by their css code
     horaires = root.cssselect(".rer table tbody tr")      # returns n elements
     fields = {}
     if len(horaires)>=1:
-        fields = {"code"       :".name",
-                  "destination":".terminus",
-                  "situation"  :".passing_time"}
+        fields = {CODE:        ".name",
+                  DESTINATION: ".terminus",
+                  HEURE:       ".passing_time"}
     return horaires, fields
+
 
 def horaires_dict(pathInfo:str):
     """ return extracted times according given pathInfo with dictionary format """
@@ -53,28 +60,30 @@ def horaires_dict(pathInfo:str):
             texte = ""
             for resField in horaire.cssselect(v):
                 for itText in resField.itertext():
+                    if k == DESTINATION:
+                        itText = itText[len(DEST_PREFIX):] if itText.startswith(DEST_PREFIX) else itText
                     texte += itText.strip()
-            textOneSpace = re.sub('\s+',' ',texte)
+            textOneSpace = re.sub('\s+', ' ', texte)
             dict_horaire[k] = textOneSpace
         extractions.append(dict_horaire)
     return extractions
-    
+
+
 def horaires_ratp(url):
     """ return extracted times according given pathInfo with list format (ready to display) """
-    #print help(lxml.html.parse)
-    #print("url=" + url)    
     # To load directly from a url, use
     root = lxml.html.parse(url).getroot()
     
     # Whenever you have an lxml element, you can convert it back to a string like so:
-    #print lxml.etree.tostring(root)
+    # print(lxml.etree.tostring(root))
 
     return selecteur_RATP(root)
 
+
 def horaires_transilien(data):
-  url = 'http://www.transilien.mobi/train/result?' + data
-  root = lxml.html.parse(url).getroot()
-  return selecteur_transilien(root)
+    url = 'http://www.transilien.mobi/train/result?' + data
+    root = lxml.html.parse(url).getroot()
+    return selecteur_transilien(root)
 
 
 def horaires(pathInfo:str):
@@ -89,13 +98,13 @@ def horaires(pathInfo:str):
             texte = ""
             for resField in horaire.cssselect(v):
                 for itText in resField.itertext():
+                    if k == DESTINATION:
+                        itText = itText[len(DEST_PREFIX):] if itText.startswith(DEST_PREFIX) else itText
                     texte += itText.strip()
-            textOneSpace = re.sub('\s+',' ',texte)
+            textOneSpace = re.sub('\s+', ' ', texte)
             item.append(textOneSpace)
         extractions.append(item)
-    
-    #print extractions
-    
+
     # extracting text from a single element 
     #linimble = root.cssselect("ul #nimble")[0]
     #help(linimble)                       # prints the documentation for the object
@@ -105,6 +114,7 @@ def horaires(pathInfo:str):
     #print list(linimble)                 # prints the <b> object
 
     return extractions
+
 
 def getUrls():
     return urls
