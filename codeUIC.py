@@ -231,6 +231,7 @@ dict_UIC_Gare = {
     87116228: 'Marles en Brie',
     87382465: 'Marly le Roi',
 
+    87754994: 'Marne la Vallée - Chessy',
     87545186: 'Marolles en Hurepoix',
     87393579: 'Massy Palaiseau',
     87383281: 'Massy Verrières',
@@ -373,6 +374,7 @@ dict_UIC_Gare = {
     87682252: 'Thomery',
     87381822: 'Thun le Paradis',
 
+    87758375: 'Torcy',
     87116210: 'Tournan',
     87393231: 'Trappes',
     87381236: 'Trie Château',
@@ -421,3 +423,14 @@ dict_UIC_Gare = {
     87682112: 'Yerres'
 }
 
+
+def get_uic_from_name(name: str):
+    name_upper = name.upper()
+    for (uic, station) in dict_UIC_Gare.items():
+        if name_upper == station.upper():
+            return uic
+    return -1
+
+
+def get_name_from_uic(uic: int):
+    return dict_UIC_Gare[uic]
