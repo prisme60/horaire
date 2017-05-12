@@ -6,6 +6,8 @@ import jsonHoraire
 import sendSMS
 import sendMsgToDisplay
 import urllib.parse
+import transilienAPI
+
 
 def horairesHTML(pathInfo, source_fct):
     extractions = source_fct(pathInfo)
@@ -13,7 +15,7 @@ def horairesHTML(pathInfo, source_fct):
     for extraction in extractions:
         htmlStr += "<tr>"
         for field in extraction:
-            htmlStr += "<td>" + field + "</td>"
+            htmlStr += "<td>" + str(field) + "</td>"
         htmlStr += "</tr>"
     htmlStr += "</table>"
     return [htmlStr.encode("utf-8")]
@@ -52,7 +54,7 @@ def msgSet(key, notUsed, queryString, body):
     """no treatment on the body (we send exactly the body like we received it)"""
     dict = urllib.parse.parse_qs(body.decode('utf-8'))
     #sendSMS.writeRawMsg(body)
-    user = dict.get('usr', 'cf')
+    user = dict['user'][0]
     print(dict)
     sendSMS.writeMsgUser(dict['msg'][0], user)
     return "Message sent to " + user
@@ -71,6 +73,8 @@ def listeGaresHTML():
     for code in scrappingHoraire.getUrls().keys():
         list_code_gare.append(code)
     for code in jsonHoraire.getUrls().keys():
+        list_code_gare.append(code)
+    for code in transilienAPI.getUrls().keys():
         list_code_gare.append(code)
     for code in sorted(list_code_gare):
         htmlStr += '<a href="' + code + '">' + code + "</a><p/>"
@@ -96,6 +100,8 @@ def application(env, start_response):
         return horairesHTML(pathInfo, scrappingHoraire.horaires)
     elif pathInfo in jsonHoraire.getUrls():
         return horairesHTML(pathInfo, jsonHoraire.horaires)
+    elif pathInfo in transilienAPI.getUrls():
+        return horairesHTML(pathInfo, transilienAPI.horaires)
     else:
         return [listeGaresHTML()+listeActionHTML()]
 
@@ -104,6 +110,8 @@ if __name__ == '__main__':
         print(horairesHTML(code, scrappingHoraire.horaires))
     for code in jsonHoraire.getUrls().keys():
         print(horairesHTML(code, jsonHoraire.horaires))
+    for code in transilienAPI.getUrls().keys():
+        print(horairesHTML(code, transilienAPI.horaires))
     print([listeGaresHTML()+listeActionHTML()])
     for (key, (action, param)) in urls_action.items():
         print(action(key, param, "", 'msg=Coucou%20a%20tous'.encode()))
