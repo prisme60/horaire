@@ -10,7 +10,11 @@ import lxml.etree
 import lxml.html
 import re
 import time
-
+import urllib.parse
+import urllib.request
+import ssl
+import http.client
+from io import StringIO
 
 CODE = "code"
 HEURE = "heure"
@@ -23,7 +27,7 @@ DEST_PREFIX = "Dir : "
 def selecteur_transilien(root:object):
     # Use cssselect to select elements by their css code
     #test = root.cssselect("#map_b")
-    #print(lxml.etree.tostring(test[0]))
+    #print(lxml.etree.tostring(test{0]))
 
     horaires = root.cssselect("li.resultat_gare")      # returns 7 elements (1 header and 6 data)
     fields = {}
@@ -80,9 +84,13 @@ def horaires_ratp(url):
     return selecteur_RATP(root)
 
 
-def horaires_transilien(data):
-    url = 'http://www.transilien.mobi/train/result?' + data
-    root = lxml.html.parse(url).getroot()
+def horaires_transilien(values):
+    url_values = urllib.parse.urlencode(values)
+    conn = http . client . HTTPSConnection('transilien.mobi')
+    conn.request('GET','/train/result?' + url_values)
+    resp = conn.getresponse()
+    data = resp.read().decode('utf-8')
+    root = lxml.html.parse(StringIO(data)).getroot()
     return selecteur_transilien(root)
 
 
@@ -106,7 +114,7 @@ def horaires(pathInfo:str):
         extractions.append(item)
 
     # extracting text from a single element 
-    #linimble = root.cssselect("ul #nimble")[0]
+    #linimble = root.cssselect("ul #nimble"){0]
     #help(linimble)                       # prints the documentation for the object
     #print lxml.etree.tostring(linimble)  # note how this includes trailing text 'junk'
     #print linimble.text                  # just the text between the tag
@@ -128,14 +136,14 @@ CERGYPREF = 'CYP'
 NANTERRE_UNIVERSITE = 'NUN'
 
 urls = {
-"chars"        : (horaires_transilien, 'idOrigin=' + CHARS),
-"pontoise"     : (horaires_transilien, 'idOrigin=' + PONTOISE),
-"p-chars"      : (horaires_transilien, 'idOrigin=' + PONTOISE),
-"sartrouville" : (horaires_transilien, 'idOrigin=' + SARTROUVILLE),
-"s-cergypref"  : (horaires_transilien, 'idOrigin=' + SARTROUVILLE + '&idDest=' + CERGYPREF),
-"psl"          : (horaires_transilien, 'idOrigin=' + PSL),
-"psl-nu"       : (horaires_transilien, 'idOrigin=' + PSL + '&idDest=' + NANTERRE_UNIVERSITE),
-"psl-pontoise" : (horaires_transilien, 'idOrigin=' + PSL + '&idDest=' + PONTOISE),
+"chars"        : (horaires_transilien, {'idOrigin': CHARS}),
+"pontoise"     : (horaires_transilien, {'idOrigin': PONTOISE}),
+"p-chars"      : (horaires_transilien, {'idOrigin': PONTOISE}),
+"sartrouville" : (horaires_transilien, {'idOrigin': SARTROUVILLE}),
+"s-cergypref"  : (horaires_transilien, {'idOrigin': SARTROUVILLE, 'idDest' : CERGYPREF}),
+"psl"          : (horaires_transilien, {'idOrigin': PSL}),
+"psl-nu"       : (horaires_transilien, {'idOrigin': PSL , 'idDest' : NANTERRE_UNIVERSITE}),
+"psl-pontoise" : (horaires_transilien, {'idOrigin': PSL , 'idDest' : PONTOISE}),
 "auber"        : (horaires_ratp      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Auber/A'),
 "lepecq"       : (horaires_ratp      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Le+Vesinet+le+Pecq/R')
 }
