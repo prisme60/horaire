@@ -43,12 +43,12 @@ def selecteur_transilien(root:object):
 
 def selecteur_RATP(root:object):
     # Use cssselect to select elements by their css code
-    horaires = root.cssselect(".rer table tbody tr")      # returns n elements
+    horaires = root.cssselect("ul.horaires-timetable li.body-rer")      # returns n elements
     fields = {}
     if len(horaires)>=1:
-        fields = {CODE:        ".name",
-                  DESTINATION: ".terminus",
-                  HEURE:       ".passing_time"}
+        fields = {CODE:        ".js-horaire-show-mission",
+                  DESTINATION: ".terminus-wrap",
+                  HEURE:       ".heure-wrap"}
     return horaires, fields
 
 
@@ -73,20 +73,20 @@ def horaires_dict(pathInfo:str):
     return extractions
 
 
-def horaires_ratp(url):
+def horaires_ratp(values):
     """ return extracted times according given pathInfo with list format (ready to display) """
-    # To load directly from a url, use
-    root = lxml.html.parse(url).getroot()
-    
-    # Whenever you have an lxml element, you can convert it back to a string like so:
-    # print(lxml.etree.tostring(root))
-
+    url_values = urllib.parse.urlencode(values)
+    conn = http.client.HTTPSConnection('www.ratp.fr')
+    conn.request('GET','/horaires?' + url_values)
+    resp = conn.getresponse()
+    data = resp.read().decode('utf-8')
+    root = lxml.html.parse(StringIO(data)).getroot()
     return selecteur_RATP(root)
 
 
 def horaires_transilien(values):
     url_values = urllib.parse.urlencode(values)
-    conn = http . client . HTTPSConnection('transilien.mobi')
+    conn = http.client.HTTPSConnection('transilien.mobi')
     conn.request('GET','/train/result?' + url_values)
     resp = conn.getresponse()
     data = resp.read().decode('utf-8')
@@ -129,6 +129,7 @@ def getUrls():
 
 
 CHARS = 'CHR'
+CONFLANS_STE_HONORINE = 'CSH'
 PONTOISE = 'PSE'
 PSL = 'PSL'
 SARTROUVILLE = 'SVL'
@@ -137,15 +138,17 @@ NANTERRE_UNIVERSITE = 'NUN'
 
 urls = {
 "chars"        : (horaires_transilien, {'idOrigin': CHARS}),
+"conflans-ste-honorine" : (horaires_transilien, {'idOrigin': CONFLANS_STE_HONORINE}),
 "pontoise"     : (horaires_transilien, {'idOrigin': PONTOISE}),
 "p-chars"      : (horaires_transilien, {'idOrigin': PONTOISE}),
 "sartrouville" : (horaires_transilien, {'idOrigin': SARTROUVILLE}),
 "s-cergypref"  : (horaires_transilien, {'idOrigin': SARTROUVILLE, 'idDest' : CERGYPREF}),
+"nanterre_u"   : (horaires_transilien, {'idOrigin': NANTERRE_UNIVERSITE}),
 "psl"          : (horaires_transilien, {'idOrigin': PSL}),
 "psl-nu"       : (horaires_transilien, {'idOrigin': PSL , 'idDest' : NANTERRE_UNIVERSITE}),
 "psl-pontoise" : (horaires_transilien, {'idOrigin': PSL , 'idDest' : PONTOISE}),
-"auber"        : (horaires_ratp      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Auber/A'),
-"lepecq"       : (horaires_ratp      ,'http://www.ratp.fr/horaires/fr/ratp/rer/prochains_passages/RA/Le+Vesinet+le+Pecq/R')
+"auber"        : (horaires_ratp      , {'networks': 'rer' ,'line_rer': 'A', 'type' : 'now', 'op': 'Rechercher', 'stop_point_rer': 'Auber'}),
+"lepecq"       : (horaires_ratp      , {'networks': 'rer' ,'line_rer': 'A', 'type' : 'now', 'op': 'Rechercher', 'stop_point_rer': 'Le Vesinet le Pecq'})
 }
 
 if __name__ == '__main__':
