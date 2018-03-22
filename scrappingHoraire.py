@@ -33,7 +33,7 @@ def selecteur_transilien(root:object):
     fields = {}
 
     if len(horaires)>0:
-        fields = {CODE:        "rain_mission",
+        fields = {CODE:        ".train_mission",
                   HEURE:       ".heure_train",
                   DESTINATION: ".garearrivee",
                   VOIE:        ".voie.bock"}
